@@ -15,6 +15,7 @@ gameSession.line = function(p1, p2) {
     this.A = this.endCoords.y - this.beginCoords.y;
     this.B = this.beginCoords.x - this.endCoords.x;
     this.C = -this.A * (this.beginCoords.x) - this.B * (this.beginCoords.y);
+    this.intersecting = false;
 }
 
 function isInSegment(a, b, c) {
