@@ -1,18 +1,21 @@
 const fieldWidth = 1000, fieldHeight = 800;
 var canvas, ctx, cursorPosX, cursorPosY,
     selectedPoint, intersectionPoints,
-    points, edges, count, currentLevel = minLevel;
+    points, edges, count, currentLevel = minLevel,
+    fieldPointColor = "#333", intersectionPointColor = "black",
+    noIntersectionColor = "black", intersectionColor = "red",
+    mode;
 
-window.onload = initialize;
-
-function initialize() {
-    field.createLayout();
+function initializeField() {
+    if (mode == "classic") field.createLayout();
+    else field.generateLayout(15);
     cursorPosX = cursorPosY = 0;
     canvas = document.createElement("canvas");
     ctx = canvas.getContext("2d");
     canvas.width = fieldWidth;
     canvas.height = fieldHeight;
     document.body.appendChild(canvas);
+    document.body.addEventListener('mousemove',  mouse.move,  false);
     canvas.addEventListener('mousemove',  mouse.move,  false);
     canvas.addEventListener('mousedown',  mouse.down,  false);
     canvas.addEventListener('mouseup',    mouse.up,    false);
@@ -52,8 +55,8 @@ function draw() {
         ctx.lineJoin = ctx.lineCap = 'round';
         ctx.shadowBlur = 3;
         ctx.shadowColor = 'rgb(0, 0, 0)';
-        ctx.strokeStyle = "green";
-        if (edges[i].intersecting) ctx.strokeStyle = "red";
+        ctx.strokeStyle = noIntersectionColor;
+        if (edges[i].intersecting) ctx.strokeStyle = intersectionColor;
         ctx.beginPath();
         ctx.moveTo(t0.x, t0.y);
         ctx.lineTo(t1.x, t1.y);
@@ -62,14 +65,14 @@ function draw() {
     }
     for (let i = 0; i < intersectionPoints.length; ++i) {
         field.drawPointPath(5, intersectionPoints[i].x, intersectionPoints[i].y);
-        ctx.fillStyle = 'blue';
+        ctx.fillStyle = intersectionPointColor;
         ctx.fill();
     }
     for (let i = 0; i < points.length; ++i) {
         x = points[i].x;
         y = points[i].y;
         field.drawPointPath(radius, x, y);
-        ctx.fillStyle = '#333';
+        ctx.fillStyle = fieldPointColor;
         ctx.fill();
     }
     window.requestAnimationFrame(draw);
@@ -94,7 +97,6 @@ function Field() {
     this.movePoint = function() {
         points[selectedPoint].x = cursorPosX;
         points[selectedPoint].y = cursorPosY;
-        console.log(points);
     }
     this.drawPointPath = function(r, x, y) {
         ctx.beginPath();
@@ -111,7 +113,6 @@ function Field() {
             point.y = level.points[i].y;
             points.push(point);
         }
-        console.log(points);
         for (let i = 0; i < level.edges.length; ++i)
             for (let j = 0; j < level.edges[i].length - 1; ++j) {
                 let edge  = {};
@@ -120,13 +121,85 @@ function Field() {
                 edge.intersecting = false;
                 edges.push(edge);
             }
-        console.log(points, edges);
     }
     this.changeLevel = function(inc) {
-        if (currentLevel + inc >= minLevel &&
-            currentLevel + inc <= maxLevel)
-            currentLevel += inc;
-        field.createLayout();
+        if (mode == "classic") {
+            if (currentLevel + inc >= minLevel &&
+                currentLevel + inc <= maxLevel)
+                currentLevel += inc;
+            field.createLayout();
+        }
+        else field.generateLayout(15);
+    }
+    this.generateLayout = function(amount) {
+        points = [];
+        edges  = [];
+        let ch = randInt(1, amount);
+        let nodes = [], node = {};
+        node.parent = 0;
+        node.vert = 0;
+        node.len = 0;
+        node.ch = amount - ch;
+        nodes.push(node);
+        let i = 0, n = 0, type = 1;
+        while(points.length < amount - 1) {
+            ++nodes[n].len;
+            let point = {};
+            point.x = randInt(radius, fieldWidth - radius);
+            point.y = randInt(radius, fieldHeight - radius);
+            points.push(point);
+            if(nodes[n].len >= ch) {
+                i = nodes[n].vert;
+                n = nodes[n].parent;
+                ch  = Math.max(randInt(1, nodes[n].ch),1);
+                nodes[n].ch = nodes[n].ch - ch;
+            }
+            else if((randInt(0, 1) > 0) && (i > 0) && (ch > 1)) {
+                let child = ch - nodes[n].length;
+                ch = randInt(1, ch);
+                nodes[n].ch = child - ch;
+                let node = {};
+                node.parent = n;
+                node.vert = i;
+                node.len = 0;
+                node.ch = 0;
+                nodes.push(node);
+                n = nodes.length-1;
+            }
+
+            let edge = {};
+            if(n != 0) type = randInt(1,3);
+            switch(type) {
+                case 1:
+                    edge.beginPoint = i;
+                    edge.endPoint = points.length;
+                    edges.push(edge);
+                    break;
+
+                case 2:
+                    edge.beginPoint = i;
+                    edge.endPoint = points.length;
+                    edges.push(edge);
+                    break;
+
+                case 3:
+                    edge.beginPoint = i;
+                    edge.endPoint = points.length;
+                    edges.push(edge);
+                    break;
+            }
+            if(i < points.length) i = points.length;
+            else ++i;
+        }
+        let point = {};
+        point.x = randInt(radius, fieldWidth - radius);
+        point.y = randInt(radius, fieldHeight - radius);
+        points.push(point);
+
+        let edge = {};
+        edge.beginPoint = points.length - 1;
+        edge.endPoint = 0;
+        edges.push(edge);
     }
 }
 

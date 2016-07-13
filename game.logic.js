@@ -1,5 +1,10 @@
 const radius = 17, EPS = 1e-16;
 
+function randInt(min, max) {
+    ++max;
+    return (Math.floor(Math.random() * (max - min)) + min);
+}
+
 function makeLine(point1, point2) {
     let beginPoint = { x: point1.x, y: point1.y };
     let endPoint = { x: point2.x, y: point2.y };
@@ -11,8 +16,7 @@ function makeLine(point1, point2) {
 
 function isInSegment(a, b, c) {
     if (Math.abs(a - b) < EPS || Math.abs(b - c) < EPS) return false;
-    const r = 0;
-    return (a + r < b && b < c - r) || (c + r < b && b < a - r);
+    return (a < b && b < c) || (c < b && b < a);
 }
 
 function intersectionPoint(line1, line2) {

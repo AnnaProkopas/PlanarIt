@@ -1,12 +1,16 @@
 body {
     text-align: center;
-    background-color: #333;
+    background-color: #fff;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 canvas {
     background-color: #fff;
     margin-top: 3%;
-    border: 5px solid #00B16A;
+    border: 5px solid #000;
     -moz-box-shadow:    inset 0 0 20px #000;
     -webkit-box-shadow: inset 0 0 20px #000;
     box-shadow:         inset 0 0 20px #000;
@@ -17,4 +21,31 @@ canvas {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.menu {
+    margin-top: 10%
+}
+
+.menu>div {
+    margin: 20px;
+    width: 500px;
+    padding: 10px;
+    font-family: Reckoner Bold;
+    font-size: 64px;
+    border: 5px solid #000;
+    -webkit-box-shadow: 0px 0px 48px -25px rgba(0,0,0,0.92);
+    -moz-box-shadow: 0px 0px 48px -25px rgba(0,0,0,0.92);
+    box-shadow: 0px 0px 48px -25px rgba(0,0,0,0.92);
+}
+.menu>div {
+    background-color: #fff;
+}
+
+.clicked {
+    background-color: #eee;
+}
+
+.menu>div, .menu>div>label {
+    cursor: pointer;
 }
