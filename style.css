@@ -11,3 +11,10 @@ canvas {
     -webkit-box-shadow: inset 0 0 20px #000;
     box-shadow:         inset 0 0 20px #000;
 }
+
+.field {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

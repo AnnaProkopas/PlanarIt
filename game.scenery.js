@@ -19,10 +19,8 @@ function initialize() {
 }
 
 function movePoint() {
-    //if (!selectedPoint) return;
     gameSession.points[selectedPoint].x = cursorPosX;
     gameSession.points[selectedPoint].y = cursorPosY;
-    draw();
 }
 
 function selectPoint() {
@@ -67,8 +65,6 @@ function draw() {
                 ps.push(p);
             }
         }
-
-
         ctx.beginPath();
         ctx.moveTo(t0.x, t0.y);
         ctx.lineTo(t1.x, t1.y);
@@ -87,6 +83,7 @@ function draw() {
         ctx.fillStyle = '#333';
         ctx.fill();
     }
+    window.requestAnimationFrame(draw);
 }
 
 function drawPointPath(r, x, y) {
@@ -112,8 +109,6 @@ function mouseDown(event) {
 
 function mouseUp(event) {
     selectedPoint = undefined;
-    //if (count == 0) { alert("You won"); gameSession.changeLevel(1) };
-    draw();
 }
 
 function mouseMove(event) {
@@ -128,7 +123,6 @@ function clear(obj) {
 gameSession.changeLevel = function(inc) {
     if (gameSession.currentLevel + inc >= minLevel && gameSession.currentLevel + inc <= maxLevel)
         gameSession.currentLevel += inc;
-    canvas.click();
     gameSession.createLayout();
 }
 
