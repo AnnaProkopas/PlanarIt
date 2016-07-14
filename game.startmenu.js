@@ -17,6 +17,24 @@ function Menu() {
         menu.lastChild.onclick = startTimeRush;
         document.body.appendChild(menu);
     }
+    this.loadGame = function() {
+        let progressBar = document.createElement("div");
+        progressBar.className = "progressBar";
+        progressBar.id = "progressBar";
+        progressBar.appendChild(createDiv("progressStatus", "progressStatus", ""));
+        document.body.appendChild(progressBar);
+        let progress = document.getElementById("progressStatus");
+        let width = 10;
+        let id = setInterval(frame, 15  );
+        function frame() {
+            if (width >= 100) { clearInterval(id); menu.createLayout(); }
+            else {
+                ++width;
+                progress.style.width = width + "%";
+            }
+        }
+        document.body.style.backgroundColor = "#fff";
+    }
 }
 
 function startClassicGame() {
@@ -33,7 +51,7 @@ function startTimeRush() {
 
 function initializeMenu() {
     field.clear(document.body);
-    menu.createLayout();
+    menu.loadGame();
 }
 
 var menu = new Menu();

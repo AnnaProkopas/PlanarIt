@@ -18,7 +18,7 @@ function createButton(className, id, fn) {
 function initializeLevelControls() {
     let returnButton = document.createElement("button");
     let levelControls = createDiv("selectors", "selectors", "");
-    levelControls.appendChild(createButton("selector", "returnButton", function() { initializeMenu() }));
+    levelControls.appendChild(createButton("selector", "returnButton", function() { field.clear(document.body); initializeMenu() }));
     levelControls.appendChild(createButton("selector", "resetButton", function() { if (mode == "classic") field.createLayout(); else field.generateLayout(pointsCount) }));
     levelControls.appendChild(createButton("selector", "bwdButton", function() { field.changeLevel(-1, true) }));
     if (mode == "time") levelControls.lastChild.style.backgroundImage = "url('Images/minus.png')";
@@ -27,7 +27,6 @@ function initializeLevelControls() {
     let score = document.createElement("label");
     score.className = score.id = "score";
     score.innerHTML = "Score: 0";
-    //levelControls.appendChild(createDiv("score", "score", "Score: 0"));
     levelControls.appendChild(score);
     document.body.appendChild(levelControls);
 }
@@ -35,7 +34,6 @@ function initializeLevelControls() {
 function initializeField() {
     if (mode == "classic") field.createLayout();
     else field.generateLayout(15);
-    initializeLevelControls();
     cursorPosX = cursorPosY = score = 0;
     canvas = document.createElement("canvas");
     ctx = canvas.getContext("2d");
@@ -47,6 +45,7 @@ function initializeField() {
     canvas.addEventListener('mousedown',  mouse.down,  false);
     canvas.addEventListener('mouseup',    mouse.up,    false);
     isMoving = false;
+    initializeLevelControls();
     draw();
 }
 
@@ -81,9 +80,6 @@ function draw() {
         t0 = points[edges[i].beginPoint];
         t1 = points[edges[i].endPoint];
         ctx.lineJoin = ctx.lineCap = 'round';
-        //ctx.shadowBlur = 3;
-        //ctx.shadowColor = 'rgb(0, 0, 0)';
-        //ctx.strokeStyle = noIntersectionColor;
         ctx.shadowBlur = 5;
         ctx.shadowColor = 'rgb(255, 255, 255)';
         ctx.strokeStyle = "rgb(255,255,255)";
@@ -109,7 +105,6 @@ function draw() {
         x = points[i].x;
         y = points[i].y;
         field.drawPointPath(radius, x, y, i);
-        //ctx.fillStyle = fieldPointColor;
         ctx.fill();
     }
     window.requestAnimationFrame(draw);
@@ -165,6 +160,14 @@ function Field() {
             field.generateLayout(pointsCount += inc);
         score = parseInt(score) + 100 - 100*skip;
         document.getElementById("score").innerHTML = "Score: " + score;
+        if (!skip) {
+            let sound = document.createElement("audio");
+            sound.src = "victory.mp3";
+            sound.setAttribute("preload", "auto");
+            sound.setAttribute("controls", "none");
+            sound.style.display = "none";
+            sound.play();
+        }
     }
     this.createLayout = function() {
         points = [];
