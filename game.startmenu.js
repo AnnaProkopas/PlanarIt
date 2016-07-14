@@ -13,7 +13,7 @@ function Menu() {
         menu.setAttribute("align", "center");
         menu.appendChild(createDiv("menu-selector", "newGame", "New game"));
         menu.lastChild.onclick = startClassicGame;
-        menu.appendChild(createDiv("menu-selector", "timeRush", "Time rush"));
+        menu.appendChild(createDiv("menu-selector", "timeRush", "Endless game"));
         menu.lastChild.onclick = startTimeRush;
         document.body.appendChild(menu);
     }
@@ -32,6 +32,7 @@ function startTimeRush() {
 }
 
 function initializeMenu() {
+    field.clear(document.body);
     menu.createLayout();
 }
 

@@ -1,15 +1,42 @@
 const fieldWidth = 1000, fieldHeight = 800;
-var canvas, ctx, cursorPosX, cursorPosY,
+var canvas, ctx, cursorPosX, cursorPosY, isMoving,
     selectedPoint, intersectionPoints,
     points, edges, count, currentLevel = minLevel,
     fieldPointColor = "#333", intersectionPointColor = "black",
-    noIntersectionColor = "black", intersectionColor = "red",
-    mode;
+    noIntersectionColor = "black", intersectionColor = "grey",
+    mode, pointsCount, minPointsCount = 10, maxPointsCount = 30, score;
+
+function createButton(className, id, fn) {
+    let btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = className;
+    btn.id = id;
+    btn.onclick = fn;
+    return btn;
+}
+
+function initializeLevelControls() {
+    let returnButton = document.createElement("button");
+    let levelControls = createDiv("selectors", "selectors", "");
+    levelControls.appendChild(createButton("selector", "returnButton", function() { initializeMenu() }));
+    levelControls.appendChild(createButton("selector", "resetButton", function() { if (mode == "classic") field.createLayout(); else field.generateLayout(pointsCount) }));
+    levelControls.appendChild(createButton("selector", "bwdButton", function() { field.changeLevel(-1, true) }));
+    if (mode == "time") levelControls.lastChild.style.backgroundImage = "url('Images/minus.png')";
+    levelControls.appendChild(createButton("selector", "fwdButton", function() { field.changeLevel(1, true) }));
+    if (mode == "time") levelControls.lastChild.style.backgroundImage = "url('Images/plus.png')";
+    let score = document.createElement("label");
+    score.className = score.id = "score";
+    score.innerHTML = "Score: 0";
+    //levelControls.appendChild(createDiv("score", "score", "Score: 0"));
+    levelControls.appendChild(score);
+    document.body.appendChild(levelControls);
+}
 
 function initializeField() {
     if (mode == "classic") field.createLayout();
     else field.generateLayout(15);
-    cursorPosX = cursorPosY = 0;
+    initializeLevelControls();
+    cursorPosX = cursorPosY = score = 0;
     canvas = document.createElement("canvas");
     ctx = canvas.getContext("2d");
     canvas.width = fieldWidth;
@@ -19,6 +46,7 @@ function initializeField() {
     canvas.addEventListener('mousemove',  mouse.move,  false);
     canvas.addEventListener('mousedown',  mouse.down,  false);
     canvas.addEventListener('mouseup',    mouse.up,    false);
+    isMoving = false;
     draw();
 }
 
@@ -53,10 +81,16 @@ function draw() {
         t0 = points[edges[i].beginPoint];
         t1 = points[edges[i].endPoint];
         ctx.lineJoin = ctx.lineCap = 'round';
-        ctx.shadowBlur = 3;
-        ctx.shadowColor = 'rgb(0, 0, 0)';
-        ctx.strokeStyle = noIntersectionColor;
-        if (edges[i].intersecting) ctx.strokeStyle = intersectionColor;
+        //ctx.shadowBlur = 3;
+        //ctx.shadowColor = 'rgb(0, 0, 0)';
+        //ctx.strokeStyle = noIntersectionColor;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = 'rgb(255, 255, 255)';
+        ctx.strokeStyle = "rgb(255,255,255)";
+        if (edges[i].intersecting)  {
+            ctx.shadowColor = 'rgb(0, 0, 0)';
+            ctx.strokeStyle = intersectionColor;
+        }
         ctx.beginPath();
         ctx.moveTo(t0.x, t0.y);
         ctx.lineTo(t1.x, t1.y);
@@ -64,15 +98,18 @@ function draw() {
         ctx.stroke();
     }
     for (let i = 0; i < intersectionPoints.length; ++i) {
-        field.drawPointPath(5, intersectionPoints[i].x, intersectionPoints[i].y);
+        ctx.shadowColor = 'rgb(255, 255, 255)';
+        ctx.beginPath();
+        ctx.arc(intersectionPoints[i].x, intersectionPoints[i].y, 5, 0, Math.PI * 2, true);
+        ctx.closePath();
         ctx.fillStyle = intersectionPointColor;
         ctx.fill();
     }
     for (let i = 0; i < points.length; ++i) {
         x = points[i].x;
         y = points[i].y;
-        field.drawPointPath(radius, x, y);
-        ctx.fillStyle = fieldPointColor;
+        field.drawPointPath(radius, x, y, i);
+        //ctx.fillStyle = fieldPointColor;
         ctx.fill();
     }
     window.requestAnimationFrame(draw);
@@ -98,10 +135,36 @@ function Field() {
         points[selectedPoint].x = cursorPosX;
         points[selectedPoint].y = cursorPosY;
     }
-    this.drawPointPath = function(r, x, y) {
+    this.drawPointPath = function(r, x, y, i) {
+        if (i == selectedPoint)
+            ctx.fillStyle = isMoving ? "#5A5A5A" : "rgb(255,255,255)";
+        else
+            ctx.fillStyle = "rgb(255,255,255)";
         ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI*2, true);
+        ctx.arc(x,y,r - 7,0, Math.PI * 2, true);
         ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2, true);
+        ctx.closePath();
+    }
+    this.changeLevel = function (inc, skip = false) {
+        if (mode == "classic") {
+            if (currentLevel + inc >= minLevel &&
+                currentLevel + inc <= maxLevel)
+                currentLevel += inc;
+            field.createLayout();
+        }
+        else if (pointsCount + inc <= maxPointsCount &&
+                 pointsCount + inc >= minPointsCount)
+            field.generateLayout(pointsCount += inc);
+        score = parseInt(score) + 100 - 100*skip;
+        document.getElementById("score").innerHTML = "Score: " + score;
     }
     this.createLayout = function() {
         points = [];
@@ -113,25 +176,18 @@ function Field() {
             point.y = level.points[i].y;
             points.push(point);
         }
-        for (let i = 0; i < level.edges.length; ++i)
+        for (let i = 0; i < level.edges.length; ++i) {
             for (let j = 0; j < level.edges[i].length - 1; ++j) {
-                let edge  = {};
+                let edge = {};
                 edge.beginPoint = level.edges[i][j];
                 edge.endPoint = level.edges[i][j + 1];
                 edge.intersecting = false;
                 edges.push(edge);
             }
-    }
-    this.changeLevel = function(inc) {
-        if (mode == "classic") {
-            if (currentLevel + inc >= minLevel &&
-                currentLevel + inc <= maxLevel)
-                currentLevel += inc;
-            field.createLayout();
         }
-        else field.generateLayout(15);
     }
     this.generateLayout = function(amount) {
+        pointsCount = amount;
         points = [];
         edges  = [];
         let ch = randInt(1, amount);
@@ -209,11 +265,13 @@ function Mouse() {
         if (selectedPoint != undefined) field.movePoint();
     }
     this.down = function(event) {
+        isMoving = true;
         mouse.getCoords(event);
         field.selectPoint();
         field.movePoint();
     }
     this.up = function(event) {
+        isMoving = false;
         selectedPoint = undefined;
         if (intersectionPoints.length == 0 && currentLevel != maxLevel)
             field.changeLevel(1);
