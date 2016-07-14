@@ -156,8 +156,12 @@ function Field() {
             field.createLayout();
         }
         else if (pointsCount + inc <= maxPointsCount &&
-                 pointsCount + inc >= minPointsCount)
-            field.generateLayout(pointsCount += inc);
+                 pointsCount + inc >= minPointsCount) {
+
+            if (pointsCount % 2 == 1)
+                field.generateLayout(pointsCount += inc);
+            else field.generateTriangle(pointsCount += inc);
+        }
         score = parseInt(score) + 100 - 100*skip;
         document.getElementById("score").innerHTML = "Score: " + score;
         if (!skip) {
@@ -188,6 +192,110 @@ function Field() {
                 edges.push(edge);
             }
         }
+    }
+    this.generateTriangle = function(amount)
+    {
+        var field = [2];
+        var N_CONST_POINT = 1, N_POINT = 4*amount / 30, N_EDGES = 1.5;
+        field.height = fieldHeight;
+        field.width = fieldWidth;
+        var level = 1;
+        points = [];
+        edges  = [];
+
+        function add(a) {
+            if (Math.round(N_EDGES * Math.random())) {
+                edges.push([]);
+                edges[edges.length - 1].beginPoint = a;
+                edges[edges.length - 1].endPoint = points.length - 1;
+                return true;
+            }
+        }
+        let first = points.length;
+        for (var i = 0; i < 3; i++) {
+            points.push(new Array(2));
+            points[first + i].x = Math.round(field.width * Math.random());
+        }
+        for (var i = 0; i < 3; i++) {
+            points[first + i].y = Math.round(field.width * Math.random());
+            if (i > 1) {
+                add(0);
+            }
+        }
+        add(1);
+
+        function generate(a, b, c, counter) {
+
+            if (counter <= 0 || points.length - 1 == amount) {
+                return;
+            }
+            function mod_for_AB(a, b) {
+                return Math.sqrt((points[a].x - points[b].x) * (points[a].x - points[b].x) + (points[a].y - points[b].y) * (points[a].y - points[b].y));
+            }
+
+            var lambda = mod_for_AB(a, c) / mod_for_AB(b, c);
+            var F = [2];
+            F.c = [5];
+            F.c.x = (points[a].x + lambda * points[b].x) / (1 + lambda);
+            F.c.y = (points[a].y + lambda * points[b].y) / (1 + lambda);
+            F.c.a = points[c].y - F.c.y;
+            F.c.b = F.c.x - points[c].x;
+            F.c.c = points[c].x * F.c.y - F.c.x * points[c].y;
+
+            lambda = mod_for_AB(b, a) / mod_for_AB(a, c);
+            F.a = [5];
+            F.a.x = (points[b].x + lambda * points[c].x) / (1 + lambda);
+            F.a.y = (points[b].y + lambda * points[c].y) / (1 + lambda);
+            F.a.a = points[a].y - F.a.y;
+            F.a.b = F.a.x - points[a].x;
+            F.a.c = points[a].x * F.a.y - F.a.x * points[a].y;
+            var Centre = [2];
+            Centre.x = (F.c.c - (F.c.b * F.a.c) / F.a.b) / ((F.c.b * F.a.a) / F.a.b - F.c.a);
+            Centre.y = (-F.a.a * Centre.x - F.a.c) / F.a.b;
+            var radius = ((points[a].y - points[b].y) * Centre.x + (points[b].x - points[a].x) * Centre.y +
+                points[a].x * points[b].y - points[b].x * points[a].x) / mod_for_AB(a, b);
+
+
+            points[points.length] = [3];
+            if (Math.round(2 * Math.random())) {
+                points[points.length - 1].x = Centre.x + Math.round(radius * Math.random());
+            }
+            else {
+                points[points.length - 1].x = Centre.x - Math.round(radius * Math.random());
+            }
+            if (Math.round(2 * Math.random())) {
+                points[points.length - 1].y = Centre.y + Math.round(radius * Math.random());
+            }
+            else {
+                points[points.length - 1].y = Centre.y - Math.round(radius * Math.random());
+            }
+            var added = false;
+            added = (add(a) == true) ? true : added;
+            added = (add(b) == true) ? true : added;
+            added = (add(c) == true) ? true : added;
+            if (!added) {
+                points.pop();
+                return;
+            }
+            added = points.length - 1;
+            generate(a, b, added, counter - 1);
+            generate(a, added, c, counter - 1);
+            generate(added, b, c, counter - 1);
+        }
+        generate(first, first + 1, first + 2, level * N_POINT);
+       /* for (var i = 0; i < N_CONST_POINT; i++)
+        {
+            points[Math.round((points.length - 1) * Math.random())].const = true;
+        }*/
+        for (var i = first; i < points.length; i++)
+        {
+            if (!points.const)
+            {
+                points[i].x = Math.round(field.width * Math.random());
+                points[i].y = Math.round(field.height * Math.random());
+            }
+        }
+
     }
     this.generateLayout = function(amount) {
         pointsCount = amount;
