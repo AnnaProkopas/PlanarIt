@@ -1,4 +1,4 @@
-var canvas, ctx, intersectionPoints,
+var canvas, ctx, intersectionPoints, selectedPoint,
     points, edges, count, currentLevel = minLevel,
     fieldPointColor = "#333", intersectionPointColor = "black",
     noIntersectionColor = "black", intersectionColor = "grey",
@@ -27,7 +27,7 @@ function draw() {
                 curEdge.intersecting = nextEdge.intersecting = true;
                 intersectionPoints.push(p);
             }
-            if (count == 0) curEdge.intersecting = false;
+            if (!count) curEdge.intersecting = false;
         }
     }
     for (let i = 0, t0, t1; i < edges.length; ++i) {
@@ -137,6 +137,7 @@ function Field() {
             let point = {};
             point.x = level.points[i].x;
             point.y = level.points[i].y;
+            point.const = false;
             points.push(point);
         }
         for (let i = 0; i < level.edges.length; ++i) {
@@ -150,132 +151,13 @@ function Field() {
         }
     }
     this.generateLayout = function(amount) {
-        pointsCount = amount;
-        points = [];
-        edges  = [];
-
-        let nodes = [], node = {};
-        node.parent = 0;
-        node.root = 0;
-        node.len = 0;
-        node.ch = amount;
-        node.last_rope = 0;
-        node.last_delta = 1;
-        node.delta = 1;
-        nodes.push(node);
-
-        let i = 0, n = 0, type = 1,lastPoint = 0;
-        while(points.length < amount - 1) {
-            ++nodes[n].len;
-            let point = {};
-            let edge = {};
-            point.x = randInt(radius, fieldWidth - radius);
-            point.y = randInt(radius, fieldHeight - radius);
-            points.push(point);
-
-            if(nodes[n].len >= nodes[n].ch) {
-                if(lastPoint != nodes[n].root) {
-                    edge = {};
-                    edge.beginPoint = lastPoint;
-                    edge.endPoint = i;
-                    edges.push(edge);
-                }
-                lastPoint = i;
-                let l = nodes[n].len;
-                n = nodes[n].parent;
-                i = nodes[n].root;
-                nodes[n].len += l;
-            }
-            else if((i > 0) && (nodes[n].ch > 1)) {
-                let act = randInt(1,3);
-
-                switch(act) {
-                    //New rope
-                    case 1:
-                        //console.log('rope'+i);
-                        if(lastPoint != nodes[n].root) {
-                            edge = {};
-                            edge.beginPoint = lastPoint;
-                            edge.endPoint = i;
-                            edges.push(edge);
-                        }
-                        lastPoint = i;
-                        nodes[n].last_rope = i;
-                        i = nodes[n].root;
-                        nodes[n].last_delta = nodes[n].delta;
-                        nodes[n].delta = nodes[n].root+nodes[n].len;
-                        //console.log(nodes[n].delta);
-                        break;
-
-                    //Create node
-                    case 2:
-                        //console.log('NODE'+i);
-                        let node = {};
-                        node.parent = n;
-                        node.root = node.last_rope = i;
-                        node.last_delta = i+1;
-                        node.delta = i+1;
-                        node.len = 1;
-                        node.ch = nodes[n].ch-nodes[n].len;
-                        nodes.push(node);
-                        n = nodes.length-1;
-                        break;
-
-                    //Not declared - default
-                    case 3:
-
-                        break;
-                }
-            }
-
-            //TYPES OF EDGE
-            if((nodes[n].last_rope > nodes[n].root)&&(i>nodes[n].root)) type = randInt(1,5);
-            else type = 1;
-            switch(type) {
-                case 1:
-                    edge = {};
-                    edge.beginPoint = i;
-                    edge.endPoint = points.length;
-                    edges.push(edge);
-                    break;
-
-                case 2:
-                    edge = {};
-                    nodes[n].last_delta += randInt(0,nodes[n].last_rope-nodes[n].last_delta);
-                    edge.beginPoint = nodes[n].last_delta;
-                    edge.endPoint = i;
-                    edges.push(edge);
-                    //console.log('DELTA1on:'+nodes[n].last_delta+'-'+i);
-                    break;
-
-                default:
-                    edge = {};
-                    edge.beginPoint = i;
-                    edge.endPoint = points.length;
-                    edges.push(edge);
-
-                    nodes[n].last_delta += randInt(0,nodes[n].last_rope-nodes[n].last_delta);
-
-                    edge = {};
-                    edge.beginPoint = nodes[n].last_delta;
-                    edge.endPoint = i;
-                    edges.push(edge);
-                    //console.log('DELTA2on:'+nodes[n].last_delta+'-'+i);
-                    break;
-            }
-
-            if(i < points.length) i = points.length;
-            else ++i;
+        let coin = 1; //DEBUG MODE --> randInt(1, 2)
+        console.log(coin);
+        switch(coin) {
+            case 1: treeGenerate(amount); break;
+            case 2: triangleGenerate(amount); break;
+            default: break;
         }
-        let point = {};
-        point.x = randInt(radius, fieldWidth - radius);
-        point.y = randInt(radius, fieldHeight - radius);
-        points.push(point);
-
-        let edge = {};
-        edge.beginPoint = points.length - 1;
-        edge.endPoint = lastPoint;
-        edges.push(edge);
     }
 }
 

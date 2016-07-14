@@ -1,6 +1,6 @@
 const fieldWidth = 1000, fieldHeight = 800, n = 3;
 var progressDelta = 10;
-var cursorPosX, cursorPosY, isMoving, selectedPoint;
+var cursorPosX, cursorPosY, isMoving;
 
 var levelControls = [];
 levelControls.push(createButton("selector", "returnButton", returnToMenu));
