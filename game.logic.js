@@ -1,4 +1,4 @@
-const radius = 17, EPS = 1e-16;
+const radius = 17, EPS = 1e-10;
 
 function randInt(min, max) {
     ++max;
