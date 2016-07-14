@@ -1,4 +1,4 @@
-const radius = 17, EPS = 1e-16;
+const radius = 17, EPS = 1e-10;
 
 function randInt(min, max) {
     ++max;
@@ -32,4 +32,9 @@ function intersectionPoint(line1, line2) {
          isInSegment(line2.beginPoint.y, y, line2.endPoint.y)))
             return { x: x, y: y};
     return false;
+}
+
+function mod_for_AB(a, b) {
+    return Math.sqrt((points[a].x - points[b].x) * (points[a].x - points[b].x) +
+                     (points[a].y - points[b].y) * (points[a].y - points[b].y));
 }

@@ -1,4 +1,4 @@
-const fieldWidth = 1000, fieldHeight = 800, n = 3;
+const fieldWidth = 1000, fieldHeight = 800, n = 4;
 var progressDelta = 10;
 var cursorPosX, cursorPosY, isMoving;
 
@@ -33,7 +33,7 @@ menuButtons.setAttribute("align", "center");
 menuButtons.appendChild(createDiv("menu-selector", "new-game", "New game"));
 menuButtons.lastChild.onclick = startClassicGame;
 menuButtons.appendChild(createDiv("menu-selector", "endless", "Endless game"));
-menuButtons.lastChild.onclick = startTimeRush;
+menuButtons.lastChild.onclick = startEndlessGame;
 
 for (let i = 0; i < levelControls.length; ++i) {
     selectors.appendChild(levelControls[i]);
@@ -109,7 +109,7 @@ function initializeField() {
 function Mouse() {
     this.move = function(event) {
         mouse.getCoords(event);
-        if (selectedPoint != undefined) field.movePoint();
+        if (selectedPoint) field.movePoint();
     }
     this.down = function(event) {
         isMoving = true;
@@ -120,10 +120,11 @@ function Mouse() {
     this.up = function(event) {
         isMoving = false;
         selectedPoint = undefined;
-        if (intersectionPoints.length == 0 && currentLevel != maxLevel)
+        if (!intersectionPoints.length)
             field.changeLevel(1);
     }
     this.getCoords = function(event) {
+        if (!points[0]) return;
         cursorPosX = event.pageX - canvas.offsetLeft;
         cursorPosY = event.pageY - canvas.offsetTop;
         if (cursorPosX > fieldWidth - radius) cursorPosX = fieldWidth - radius;

@@ -111,9 +111,11 @@ function Field() {
     this.changeLevel = function (inc, skip = false) {
         if (mode == "classic") {
             if (currentLevel + inc >= minLevel &&
-                currentLevel + inc <= maxLevel)
+                currentLevel + inc <= maxLevel) {
                 currentLevel += inc;
-            field.createLayout();
+                field.createLayout();
+            } else if ((currentLevel + inc) == maxLevel + 1)
+                returnToMenu();
         }
         else if (pointsCount + inc <= maxPointsCount &&
                  pointsCount + inc >= minPointsCount)
@@ -137,7 +139,7 @@ function Field() {
             let point = {};
             point.x = level.points[i].x;
             point.y = level.points[i].y;
-            point.const = false;
+            //point.const = false;
             points.push(point);
         }
         for (let i = 0; i < level.edges.length; ++i) {
@@ -151,7 +153,7 @@ function Field() {
         }
     }
     this.generateLayout = function(amount) {
-        let coin = 1; //DEBUG MODE --> randInt(1, 2)
+        let coin = randInt(1, 2); //DEBUG MODE --> randInt(1, 2)
         console.log(coin);
         switch(coin) {
             case 1: treeGenerate(amount); break;

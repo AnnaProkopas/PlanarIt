@@ -25,10 +25,14 @@ function startClassicGame() {
     menu.createLevelView();
 }
 
-function startTimeRush() {
+function startEndlessGame() {
     mode = "endless";
     field.clear(document.body);
     initializeField();
+}
+
+function initializeGameOnce() {
+    menu.loadGame();
 }
 
 function initializeMenu() {
@@ -37,4 +41,4 @@ function initializeMenu() {
 }
 
 var menu = new Menu();
-window.onload = initializeMenu;
+window.onload = initializeGameOnce;
