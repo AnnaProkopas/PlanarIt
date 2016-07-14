@@ -58,6 +58,14 @@ canvas {
     background-image: url('Images/bwd.png');
 }
 
+#incButton {
+    background-image: url('Images/plus.png');
+}
+
+#decButton {
+    background-image: url('Images/minus.png');
+}
+
 .menu>div {
     margin: 20px;
     width: 500px;

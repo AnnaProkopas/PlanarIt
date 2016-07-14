@@ -1,53 +1,8 @@
-const fieldWidth = 1000, fieldHeight = 800;
-var canvas, ctx, cursorPosX, cursorPosY, isMoving,
-    selectedPoint, intersectionPoints,
+var canvas, ctx, intersectionPoints,
     points, edges, count, currentLevel = minLevel,
     fieldPointColor = "#333", intersectionPointColor = "black",
     noIntersectionColor = "black", intersectionColor = "grey",
     mode, pointsCount, minPointsCount = 10, maxPointsCount = 30, score;
-
-function createButton(className, id, fn) {
-    let btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = className;
-    btn.id = id;
-    btn.onclick = fn;
-    return btn;
-}
-
-function initializeLevelControls() {
-    let returnButton = document.createElement("button");
-    let levelControls = createDiv("selectors", "selectors", "");
-    levelControls.appendChild(createButton("selector", "returnButton", function() { field.clear(document.body); initializeMenu() }));
-    levelControls.appendChild(createButton("selector", "resetButton", function() { if (mode == "classic") field.createLayout(); else field.generateLayout(pointsCount) }));
-    levelControls.appendChild(createButton("selector", "bwdButton", function() { field.changeLevel(-1, true) }));
-    if (mode == "time") levelControls.lastChild.style.backgroundImage = "url('Images/minus.png')";
-    levelControls.appendChild(createButton("selector", "fwdButton", function() { field.changeLevel(1, true) }));
-    if (mode == "time") levelControls.lastChild.style.backgroundImage = "url('Images/plus.png')";
-    let score = document.createElement("label");
-    score.className = score.id = "score";
-    score.innerHTML = "Score: 0";
-    levelControls.appendChild(score);
-    document.body.appendChild(levelControls);
-}
-
-function initializeField() {
-    if (mode == "classic") field.createLayout();
-    else field.generateLayout(15);
-    cursorPosX = cursorPosY = score = 0;
-    canvas = document.createElement("canvas");
-    ctx = canvas.getContext("2d");
-    canvas.width = fieldWidth;
-    canvas.height = fieldHeight;
-    document.body.appendChild(canvas);
-    document.body.addEventListener('mousemove',  mouse.move,  false);
-    canvas.addEventListener('mousemove',  mouse.move,  false);
-    canvas.addEventListener('mousedown',  mouse.down,  false);
-    canvas.addEventListener('mouseup',    mouse.up,    false);
-    isMoving = false;
-    initializeLevelControls();
-    draw();
-}
 
 function draw() {
     ctx.clearRect(0, 0, fieldWidth, fieldHeight);
@@ -71,7 +26,6 @@ function draw() {
                 ++count;
                 curEdge.intersecting = nextEdge.intersecting = true;
                 intersectionPoints.push(p);
-                break;
             }
             if (count == 0) curEdge.intersecting = false;
         }
@@ -112,6 +66,12 @@ function draw() {
 
 function Field() {
     this.clear = function(obj) {
+        if (points && edges && intersectionPoints) {
+            for (let i = 0; i < points.length; ++i) points[i] = null;
+            for (let i = 0; i < edges.length; ++i) edges[i] = null;
+            for (let i = 0; i < intersectionPoints.length; ++i) intersectionPoints[i] = null;
+            canvas = null;
+        }
         while (obj.lastChild) obj.removeChild(obj.lastChild);
     }
     this.selectPoint = function() {
@@ -193,60 +153,117 @@ function Field() {
         pointsCount = amount;
         points = [];
         edges  = [];
-        let ch = randInt(1, amount);
+
         let nodes = [], node = {};
         node.parent = 0;
-        node.vert = 0;
+        node.root = 0;
         node.len = 0;
-        node.ch = amount - ch;
+        node.ch = amount;
+        node.last_rope = 0;
+        node.last_delta = 1;
+        node.delta = 1;
         nodes.push(node);
-        let i = 0, n = 0, type = 1;
+
+        let i = 0, n = 0, type = 1,lastPoint = 0;
         while(points.length < amount - 1) {
             ++nodes[n].len;
             let point = {};
+            let edge = {};
             point.x = randInt(radius, fieldWidth - radius);
             point.y = randInt(radius, fieldHeight - radius);
             points.push(point);
-            if(nodes[n].len >= ch) {
-                i = nodes[n].vert;
+
+            if(nodes[n].len >= nodes[n].ch) {
+                if(lastPoint != nodes[n].root) {
+                    edge = {};
+                    edge.beginPoint = lastPoint;
+                    edge.endPoint = i;
+                    edges.push(edge);
+                }
+                lastPoint = i;
+                let l = nodes[n].len;
                 n = nodes[n].parent;
-                ch  = Math.max(randInt(1, nodes[n].ch),1);
-                nodes[n].ch = nodes[n].ch - ch;
+                i = nodes[n].root;
+                nodes[n].len += l;
             }
-            else if((randInt(0, 1) > 0) && (i > 0) && (ch > 1)) {
-                let child = ch - nodes[n].length;
-                ch = randInt(1, ch);
-                nodes[n].ch = child - ch;
-                let node = {};
-                node.parent = n;
-                node.vert = i;
-                node.len = 0;
-                node.ch = 0;
-                nodes.push(node);
-                n = nodes.length-1;
+            else if((i > 0) && (nodes[n].ch > 1)) {
+                let act = randInt(1,3);
+
+                switch(act) {
+                    //New rope
+                    case 1:
+                        //console.log('rope'+i);
+                        if(lastPoint != nodes[n].root) {
+                            edge = {};
+                            edge.beginPoint = lastPoint;
+                            edge.endPoint = i;
+                            edges.push(edge);
+                        }
+                        lastPoint = i;
+                        nodes[n].last_rope = i;
+                        i = nodes[n].root;
+                        nodes[n].last_delta = nodes[n].delta;
+                        nodes[n].delta = nodes[n].root+nodes[n].len;
+                        //console.log(nodes[n].delta);
+                        break;
+
+                    //Create node
+                    case 2:
+                        //console.log('NODE'+i);
+                        let node = {};
+                        node.parent = n;
+                        node.root = node.last_rope = i;
+                        node.last_delta = i+1;
+                        node.delta = i+1;
+                        node.len = 1;
+                        node.ch = nodes[n].ch-nodes[n].len;
+                        nodes.push(node);
+                        n = nodes.length-1;
+                        break;
+
+                    //Not declared - default
+                    case 3:
+
+                        break;
+                }
             }
 
-            let edge = {};
-            if(n != 0) type = randInt(1,3);
+            //TYPES OF EDGE
+            if((nodes[n].last_rope > nodes[n].root)&&(i>nodes[n].root)) type = randInt(1,5);
+            else type = 1;
             switch(type) {
                 case 1:
+                    edge = {};
                     edge.beginPoint = i;
                     edge.endPoint = points.length;
                     edges.push(edge);
                     break;
 
                 case 2:
-                    edge.beginPoint = i;
-                    edge.endPoint = points.length;
+                    edge = {};
+                    nodes[n].last_delta += randInt(0,nodes[n].last_rope-nodes[n].last_delta);
+                    edge.beginPoint = nodes[n].last_delta;
+                    edge.endPoint = i;
                     edges.push(edge);
+                    //console.log('DELTA1on:'+nodes[n].last_delta+'-'+i);
                     break;
 
-                case 3:
+                default:
+                    edge = {};
                     edge.beginPoint = i;
                     edge.endPoint = points.length;
                     edges.push(edge);
+
+                    nodes[n].last_delta += randInt(0,nodes[n].last_rope-nodes[n].last_delta);
+
+                    edge = {};
+                    edge.beginPoint = nodes[n].last_delta;
+                    edge.endPoint = i;
+                    edges.push(edge);
+                    //console.log('DELTA2on:'+nodes[n].last_delta+'-'+i);
                     break;
             }
+
             if(i < points.length) i = points.length;
             else ++i;
         }
@@ -257,38 +274,9 @@ function Field() {
 
         let edge = {};
         edge.beginPoint = points.length - 1;
-        edge.endPoint = 0;
+        edge.endPoint = lastPoint;
         edges.push(edge);
     }
 }
 
-function Mouse() {
-    this.move = function(event) {
-        mouse.getCoords(event);
-        if (selectedPoint != undefined) field.movePoint();
-    }
-    this.down = function(event) {
-        isMoving = true;
-        mouse.getCoords(event);
-        field.selectPoint();
-        field.movePoint();
-    }
-    this.up = function(event) {
-        isMoving = false;
-        selectedPoint = undefined;
-        if (intersectionPoints.length == 0 && currentLevel != maxLevel)
-            field.changeLevel(1);
-    }
-    this.getCoords = function(event) {
-        cursorPosX = event.pageX - canvas.offsetLeft;
-        cursorPosY = event.pageY - canvas.offsetTop;
-        if (cursorPosX > fieldWidth - radius) cursorPosX = fieldWidth - radius;
-        else if (cursorPosX < radius) cursorPosX = radius;
-        if (cursorPosY > fieldHeight - radius) cursorPosY = fieldHeight - radius;
-        else if (cursorPosY < radius) cursorPosY = radius;
-    }
-
-};
-
-var mouse = new Mouse();
 var field = new Field();
