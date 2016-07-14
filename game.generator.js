@@ -124,7 +124,8 @@ function treeGenerate(amount) {
     edges.push(edge);
 }
 
-var N_CONST_POINT = 1, N_EDGES = 2.5;
+
+var N_CONST_POINT = 1, N_EDGES = 3;
 function triangleGenerate(amount) {
     let N_POINT = 4*amount / 30;
     let field = [2];
@@ -138,7 +139,7 @@ function triangleGenerate(amount) {
     for (let i = 0; i < 3; i++) {
         let point = {};
         point.x = Math.round(field.width * Math.random());
-        point.y = Math.round(field.width * Math.random());
+        point.y = Math.round(field.height * Math.random());
         points.push(point);
     }
     for (let i = 0; i < 3; i++) {
@@ -149,9 +150,9 @@ function triangleGenerate(amount) {
     add(1);
 
     generate(first, first + 1, first + 2, level * N_POINT);
-     for (let i = 0; i < N_CONST_POINT; i++) {
-     points[Math.round((points.length - 1) * Math.random())].stat = true;
-     }
+    for (let i = 0; i < N_CONST_POINT; i++) {
+        points[Math.round((points.length - 1) * Math.random())].stat = true;
+    }
     for (let i = first; i < points.length; i++) {
         if (!points[i].stat) {
             points[i].x = Math.round(field.width * Math.random());
@@ -175,6 +176,10 @@ function generate(a, b, c, counter, amount) {
         return;
     }
 
+    function mod_for_AB(a, b) {
+        return Math.sqrt((points[a].x - points[b].x) * (points[a].x - points[b].x) + (
+            points[a].y - points[b].y) * (points[a].y - points[b].y));
+    }
     let lambda = mod_for_AB(a, c) / mod_for_AB(b, c);
     let F = [2];
     F.c = [5];
@@ -191,27 +196,11 @@ function generate(a, b, c, counter, amount) {
     F.a.a = points[a].y - F.a.y;
     F.a.b = F.a.x - points[a].x;
     F.a.c = points[a].x * F.a.y - F.a.x * points[a].y;
-    let Centre = [2];
-    Centre.x = (F.c.c - (F.c.b * F.a.c) / F.a.b) / ((F.c.b * F.a.a) / F.a.b - F.c.a);
-    Centre.y = (-F.a.a * Centre.x - F.a.c) / F.a.b;
-    let radius = ((points[a].y - points[b].y) * Centre.x + (points[b].x - points[a].x) * Centre.y +
-        points[a].x * points[b].y - points[b].x * points[a].x) / mod_for_AB(a, b);
-
-
     let point = {};
-    if (Math.round(2 * Math.random())) {
-        point.x = Centre.x + Math.round(radius * Math.random());
-    }
-    else {
-        point.x = Centre.x - Math.round(radius * Math.random());
-    }
-    if (Math.round(2 * Math.random())) {
-        point.y = Centre.y + Math.round(radius * Math.random());
-    }
-    else {
-        point.y = Centre.y - Math.round(radius * Math.random());
-    }
+    point.x = (F.c.c - (F.c.b * F.a.c) / F.a.b) / ((F.c.b * F.a.a) / F.a.b - F.c.a);
+    point.y = (-1 * F.a.a * point.x - F.a.c) / F.a.b;
     points.push(point);
+    console.log(point.x + ' ' + point.y);
     let added = false;
     added = (add(a) == true) ? true : added;
     added = (add(b) == true) ? true : added;
