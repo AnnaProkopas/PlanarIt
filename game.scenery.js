@@ -205,9 +205,10 @@ function Field() {
 
         function add(a) {
             if (Math.round(N_EDGES * Math.random())) {
-                edges.push([]);
-                edges[edges.length - 1].beginPoint = a;
-                edges[edges.length - 1].endPoint = points.length - 1;
+                let edge = {};
+                edge.beginPoint = a;
+                edge.endPoint = points.length - 1;
+                edges.push(edge);
                 return true;
             }
         }
