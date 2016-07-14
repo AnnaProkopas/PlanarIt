@@ -124,7 +124,7 @@ function treeGenerate(amount) {
     edges.push(edge);
 }
 
-var N_CONST_POINT = 1, N_EDGES = 1.5;
+var N_CONST_POINT = 1, N_EDGES = 2.5;
 function triangleGenerate(amount) {
     let N_POINT = 4*amount / 30;
     let field = [2];
@@ -148,12 +148,12 @@ function triangleGenerate(amount) {
     }
     add(1);
 
-    generate(first, first + 1, first + 2, level * N_POINT, amount);
-    /*for (let i = 0; i < N_CONST_POINT; i++) {
-     points[Math.round((points.length - 1) * Math.random())].const = true;
-     }*/
+    generate(first, first + 1, first + 2, level * N_POINT);
+     for (let i = 0; i < N_CONST_POINT; i++) {
+     points[Math.round((points.length - 1) * Math.random())].stat = true;
+     }
     for (let i = first; i < points.length; i++) {
-        if (!points[i].const) {
+        if (!points[i].stat) {
             points[i].x = Math.round(field.width * Math.random());
             points[i].y = Math.round(field.height * Math.random());
         }
@@ -221,7 +221,7 @@ function generate(a, b, c, counter, amount) {
         return;
     }
     added = points.length - 1;
-    generate(a, b, added, counter - 1);
-    generate(a, added, c, counter - 1);
-    generate(added, b, c, counter - 1);
+    generate(a, b, added, counter - 1, amount);
+    generate(a, added, c, counter - 1, amount);
+    generate(added, b, c, counter - 1, amount);
 }

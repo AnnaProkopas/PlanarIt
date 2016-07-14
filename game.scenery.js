@@ -2,7 +2,7 @@ var canvas, ctx, intersectionPoints, selectedPoint,
     points, edges, count, currentLevel = minLevel,
     fieldPointColor = "#333", intersectionPointColor = "black",
     noIntersectionColor = "black", intersectionColor = "grey",
-    mode, pointsCount, minPointsCount = 10, maxPointsCount = 20, score;
+    mode, pointsCount, minPointsCount = 10, maxPointsCount = 11, score;
 
 function draw() {
     ctx.clearRect(0, 0, fieldWidth, fieldHeight);
@@ -87,14 +87,20 @@ function Field() {
         }
     }
     this.movePoint = function() {
-        points[selectedPoint].x = cursorPosX;
-        points[selectedPoint].y = cursorPosY;
+        console.log(selectedPoint);
+        if (!points[selectedPoint].stat)
+        {
+            points[selectedPoint].x = cursorPosX;
+            points[selectedPoint].y = cursorPosY;
+        }
     }
     this.drawPointPath = function(r, x, y, i) {
         if (i == selectedPoint)
             ctx.fillStyle = isMoving ? "#5A5A5A" : "rgb(255,255,255)";
         else
             ctx.fillStyle = "rgb(255,255,255)";
+        if (points[i].stat)
+            ctx.fillStyle = "rgb(139, 35, 35)";
         ctx.beginPath();
         ctx.arc(x,y,r - 7,0, Math.PI * 2, true);
         ctx.closePath();
@@ -140,7 +146,7 @@ function Field() {
             let point = {};
             point.x = level.points[i].x;
             point.y = level.points[i].y;
-            //point.const = false;
+            point.stat = level.points[i].stat;
             points.push(point);
         }
         for (let i = 0; i < level.edges.length; ++i) {
@@ -154,11 +160,10 @@ function Field() {
         }
     }
     this.generateLayout = function(amount) {
-        //treeGenerate(amount);
-        let coin = randInt(1, 2); //DEBUG MODE --> randInt(1, 2)
-        switch(coin) {
-            case 1: treeGenerate(amount); break;
-            case 2: triangleGenerate(amount); break;
+        console.log(amount % 2);
+        switch(amount % 2) {
+            case 0: treeGenerate(amount); break;
+            case 1: triangleGenerate(amount); break;
             default: break;
         }
     }
