@@ -111,6 +111,8 @@ function treeGenerate(amount) {
         if (i < points.length) i = points.length;
         else ++i;
     }
+    delete node;
+    delete nodes;
     let point = {};
     point.x = randInt(radius, fieldWidth - radius);
     point.y = randInt(radius, fieldHeight - radius);
@@ -134,11 +136,12 @@ function triangleGenerate(amount) {
 
     let first = points.length;
     for (let i = 0; i < 3; i++) {
-        points.push(new Array(2));
-        points[first + i].x = Math.round(field.width * Math.random());
+        let point = {};
+        point.x = Math.round(field.width * Math.random());
+        point.y = Math.round(field.width * Math.random());
+        points.push(point);
     }
     for (let i = 0; i < 3; i++) {
-        points[first + i].y = Math.round(field.width * Math.random());
         if (i > 1) {
             add(0);
         }
@@ -146,7 +149,7 @@ function triangleGenerate(amount) {
     add(1);
 
     generate(first, first + 1, first + 2, level * N_POINT, amount);
-     /*for (let i = 0; i < N_CONST_POINT; i++) {
+    /*for (let i = 0; i < N_CONST_POINT; i++) {
      points[Math.round((points.length - 1) * Math.random())].const = true;
      }*/
     for (let i = first; i < points.length; i++) {
@@ -195,19 +198,20 @@ function generate(a, b, c, counter, amount) {
         points[a].x * points[b].y - points[b].x * points[a].x) / mod_for_AB(a, b);
 
 
-    points[points.length] = [3];
+    let point = {};
     if (Math.round(2 * Math.random())) {
-        points[points.length - 1].x = Centre.x + Math.round(radius * Math.random());
+        point.x = Centre.x + Math.round(radius * Math.random());
     }
     else {
-        points[points.length - 1].x = Centre.x - Math.round(radius * Math.random());
+        point.x = Centre.x - Math.round(radius * Math.random());
     }
     if (Math.round(2 * Math.random())) {
-        points[points.length - 1].y = Centre.y + Math.round(radius * Math.random());
+        point.y = Centre.y + Math.round(radius * Math.random());
     }
     else {
-        points[points.length - 1].y = Centre.y - Math.round(radius * Math.random());
+        point.y = Centre.y - Math.round(radius * Math.random());
     }
+    points.push(point);
     let added = false;
     added = (add(a) == true) ? true : added;
     added = (add(b) == true) ? true : added;

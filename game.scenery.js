@@ -2,7 +2,7 @@ var canvas, ctx, intersectionPoints, selectedPoint,
     points, edges, count, currentLevel = minLevel,
     fieldPointColor = "#333", intersectionPointColor = "black",
     noIntersectionColor = "black", intersectionColor = "grey",
-    mode, pointsCount, minPointsCount = 10, maxPointsCount = 11, score;
+    mode, pointsCount, minPointsCount = 10, maxPointsCount = 20, score;
 
 function draw() {
     ctx.clearRect(0, 0, fieldWidth, fieldHeight);
@@ -87,7 +87,6 @@ function Field() {
         }
     }
     this.movePoint = function() {
-        console.log(selectedPoint);
         points[selectedPoint].x = cursorPosX;
         points[selectedPoint].y = cursorPosY;
     }
@@ -155,8 +154,8 @@ function Field() {
         }
     }
     this.generateLayout = function(amount) {
+        //treeGenerate(amount);
         let coin = randInt(1, 2); //DEBUG MODE --> randInt(1, 2)
-        console.log(coin);
         switch(coin) {
             case 1: treeGenerate(amount); break;
             case 2: triangleGenerate(amount); break;

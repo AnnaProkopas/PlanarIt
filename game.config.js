@@ -115,7 +115,7 @@ function Mouse() {
         isMoving = true;
         mouse.getCoords(event);
         field.selectPoint();
-        field.movePoint();
+        //field.movePoint();
     }
     this.up = function(event) {
         isMoving = false;
