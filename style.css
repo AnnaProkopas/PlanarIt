@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Reckoner Bold;
+    src: url('reckoner.bold.ttf') format("truetype");
+}
+
 body {
     text-align: center;
     background-color: #fff;
@@ -105,4 +110,42 @@ canvas {
     width: 0%;
     height: 100%;
     background-color: #00B16A;
+}
+
+.level-select-row {
+    margin-top: 7%;
+    display: inline-block;
+}
+
+.level-select-tile {
+    font-family: "Reckoner Bold";
+    margin: 10px;
+    border: 5px solid #000;
+    border-radius: 5px;
+    font-size: 200px;
+    height: 200px;
+    width: 200px;
+}
+
+.level-select-tile, .level-select-tile>label {
+    cursor: pointer;
+}
+
+.level-select-row:nth-of-type(odd)>.level-select-tile:nth-of-type(even),
+.level-select-row:nth-of-type(even)>.level-select-tile:nth-of-type(odd) {
+    background-color: #000;
+    color: #fff;
+}
+.level-select-row:nth-of-type(odd)>.level-select-tile:nth-of-type(odd),
+.level-select-row:nth-of-type(even)>.level-select-tile:nth-of-type(even) {
+    background-color: #fff;
+    color: #000;
+}
+
+.level-select-row:nth-of-type(odd)>.level-select-tile:nth-of-type(even):hover,
+.level-select-row:nth-of-type(even)>.level-select-tile:nth-of-type(odd):hover,
+.level-select-row:nth-of-type(even)>.level-select-tile:nth-of-type(even):hover,
+.level-select-row:nth-of-type(odd)>.level-select-tile:nth-of-type(odd):hover {
+    background-color: #aaa;
+    color: #fff;
 }
