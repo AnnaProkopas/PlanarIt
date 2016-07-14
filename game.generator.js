@@ -14,7 +14,7 @@ function treeGenerate(amount) {
     nodes.push(node);
 
     let i = 0, n = 0, type = 1, lastPoint = 0;
-    while(points.length < amount - 1) {
+    while (points.length < amount - 1) {
         ++nodes[n].len;
         let point = {};
         let edge = {};
@@ -22,7 +22,7 @@ function treeGenerate(amount) {
         point.y = randInt(radius, fieldHeight - radius);
         points.push(point);
 
-        if(nodes[n].len >= nodes[n].ch) {
+        if (nodes[n].len >= nodes[n].ch) {
             if(lastPoint != nodes[n].root) {
                 edge = {};
                 edge.beginPoint = lastPoint;
@@ -35,7 +35,7 @@ function treeGenerate(amount) {
             i = nodes[n].root;
             nodes[n].len += l;
         }
-        else if((i > 0) && (nodes[n].ch > 1)) {
+        else if ((i > 0) && (nodes[n].ch > 1)) {
             let act = randInt(1,3);
 
             switch(act) {
@@ -75,7 +75,7 @@ function treeGenerate(amount) {
         }
 
         //TYPES OF EDGE
-        if((nodes[n].lastRope > nodes[n].root) && (i > nodes[n].root)) type = randInt(1,5);
+        if ((nodes[n].lastRope > nodes[n].root) && (i > nodes[n].root)) type = randInt(1,5);
         else type = 1;
         switch(type) {
             case 1:
@@ -108,7 +108,7 @@ function treeGenerate(amount) {
                 break;
         }
 
-        if(i < points.length) i = points.length;
+        if (i < points.length) i = points.length;
         else ++i;
     }
     let point = {};
@@ -122,10 +122,9 @@ function treeGenerate(amount) {
     edges.push(edge);
 }
 
-
-var N_CONST_POINT = 1, N_EDGES = 3;
+var N_CONST_POINT = 1, N_EDGES = 1.5;
 function triangleGenerate(amount) {
-    let N_POINT = 5*amount / 30;
+    let N_POINT = 4*amount / 30;
     let field = [2];
     field.height = fieldHeight - radius;
     field.width = fieldWidth - radius;
@@ -136,10 +135,10 @@ function triangleGenerate(amount) {
     let first = points.length;
     for (let i = 0; i < 3; i++) {
         points.push(new Array(2));
-        points[first + i].x = Math.floor(field.width * Math.random());
+        points[first + i].x = Math.round(field.width * Math.random());
     }
     for (let i = 0; i < 3; i++) {
-        points[first + i].y = Math.floor(field.width * Math.random());
+        points[first + i].y = Math.round(field.width * Math.random());
         if (i > 1) {
             add(0);
         }
@@ -147,8 +146,7 @@ function triangleGenerate(amount) {
     add(1);
 
     generate(first, first + 1, first + 2, level * N_POINT, amount);
-    /* for (var i = 0; i < N_CONST_POINT; i++)
-     {
+     /*for (let i = 0; i < N_CONST_POINT; i++) {
      points[Math.round((points.length - 1) * Math.random())].const = true;
      }*/
     for (let i = first; i < points.length; i++) {
@@ -160,7 +158,7 @@ function triangleGenerate(amount) {
 }
 
 function add(a) {
-    if (Math.floor(N_EDGES * Math.random())) {
+    if (Math.round(N_EDGES * Math.random())) {
         let edge = {};
         edge.beginPoint = a;
         edge.endPoint = points.length - 1;

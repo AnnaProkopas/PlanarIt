@@ -2,7 +2,7 @@ var canvas, ctx, intersectionPoints, selectedPoint,
     points, edges, count, currentLevel = minLevel,
     fieldPointColor = "#333", intersectionPointColor = "black",
     noIntersectionColor = "black", intersectionColor = "grey",
-    mode, pointsCount, minPointsCount = 10, maxPointsCount = 30, score;
+    mode, pointsCount, minPointsCount = 10, maxPointsCount = 11, score;
 
 function draw() {
     ctx.clearRect(0, 0, fieldWidth, fieldHeight);
@@ -87,6 +87,7 @@ function Field() {
         }
     }
     this.movePoint = function() {
+        console.log(selectedPoint);
         points[selectedPoint].x = cursorPosX;
         points[selectedPoint].y = cursorPosY;
     }
@@ -120,6 +121,7 @@ function Field() {
         else if (pointsCount + inc <= maxPointsCount &&
                  pointsCount + inc >= minPointsCount)
             field.generateLayout(pointsCount += inc);
+        else field.generateLayout(pointsCount);
         score = parseInt(score) + 100 - 100*skip;
         document.getElementById("score").innerHTML = "Score: " + score;
         if (!skip) {

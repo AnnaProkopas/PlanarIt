@@ -109,7 +109,7 @@ function initializeField() {
 function Mouse() {
     this.move = function(event) {
         mouse.getCoords(event);
-        if (selectedPoint) field.movePoint();
+        if (selectedPoint != undefined) field.movePoint();
     }
     this.down = function(event) {
         isMoving = true;
@@ -124,7 +124,7 @@ function Mouse() {
             field.changeLevel(1);
     }
     this.getCoords = function(event) {
-        if (!points[0]) return;
+        if (points[0] == null) return;
         cursorPosX = event.pageX - canvas.offsetLeft;
         cursorPosY = event.pageY - canvas.offsetTop;
         if (cursorPosX > fieldWidth - radius) cursorPosX = fieldWidth - radius;
