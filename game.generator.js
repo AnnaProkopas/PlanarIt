@@ -8,8 +8,8 @@ function treeGenerate(amount) {
     node.root = 0;
     node.len = 0;
     node.ch = amount;
-    node.last_rope = 0;
-    node.last_delta = 1;
+    node.lastRope = 0;
+    node.lastDelta = 1;
     node.delta = 1;
     nodes.push(node);
 
@@ -48,9 +48,9 @@ function treeGenerate(amount) {
                         edges.push(edge);
                     }
                     lastPoint = i;
-                    nodes[n].last_rope = i;
+                    nodes[n].lastRope = i;
                     i = nodes[n].root;
-                    nodes[n].last_delta = nodes[n].delta;
+                    nodes[n].lastDelta = nodes[n].delta;
                     nodes[n].delta = nodes[n].root+nodes[n].len;
                     break;
 
@@ -58,8 +58,8 @@ function treeGenerate(amount) {
                 case 2:
                     let node = {};
                     node.parent = n;
-                    node.root = node.last_rope = i;
-                    node.last_delta = i+1;
+                    node.root = node.lastRope = i;
+                    node.lastDelta = i+1;
                     node.delta = i+1;
                     node.len = 1;
                     node.ch = nodes[n].ch-nodes[n].len;
@@ -75,7 +75,7 @@ function treeGenerate(amount) {
         }
 
         //TYPES OF EDGE
-        if((nodes[n].last_rope > nodes[n].root) && (i > nodes[n].root)) type = randInt(1,5);
+        if((nodes[n].lastRope > nodes[n].root) && (i > nodes[n].root)) type = randInt(1,5);
         else type = 1;
         switch(type) {
             case 1:
@@ -87,8 +87,8 @@ function treeGenerate(amount) {
 
             case 2:
                 edge = {};
-                nodes[n].last_delta += randInt(0,nodes[n].last_rope-nodes[n].last_delta);
-                edge.beginPoint = nodes[n].last_delta;
+                nodes[n].lastDelta += randInt(0,nodes[n].lastRope - nodes[n].lastDelta);
+                edge.beginPoint = nodes[n].lastDelta;
                 edge.endPoint = i;
                 edges.push(edge);
                 break;
@@ -99,10 +99,10 @@ function treeGenerate(amount) {
                 edge.endPoint = points.length;
                 edges.push(edge);
 
-                nodes[n].last_delta += randInt(0,nodes[n].last_rope-nodes[n].last_delta);
+                nodes[n].lastDelta += randInt(0, nodes[n].lastRope - nodes[n].lastDelta);
 
                 edge = {};
-                edge.beginPoint = nodes[n].last_delta;
+                edge.beginPoint = nodes[n].lastDelta;
                 edge.endPoint = i;
                 edges.push(edge);
                 break;

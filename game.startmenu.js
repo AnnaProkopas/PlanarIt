@@ -4,7 +4,7 @@ function Menu() {
     }
     this.loadGame = function() {
         document.body.appendChild(progressBar);
-        let progress = document.getElementById("progressStatus");
+        let progress = document.getElementById("progress-status");
         let id = setInterval(frame, 15);
         function frame() {
             if (progressDelta >= 100) { clearInterval(id); menu.createLayout(); }
@@ -26,7 +26,7 @@ function startClassicGame() {
 }
 
 function startTimeRush() {
-    mode = "time";
+    mode = "endless";
     field.clear(document.body);
     initializeField();
 }

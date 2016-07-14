@@ -3,17 +3,17 @@ var progressDelta = 10;
 var cursorPosX, cursorPosY, isMoving;
 
 var levelControls = [];
-levelControls.push(createButton("selector", "returnButton", returnToMenu));
-levelControls.push(createButton("selector", "resetButton", resetLevel));
-levelControls.push(createButton("selector", "bwdButton", prevLevel));
-levelControls.push(createButton("selector", "fwdButton", nextLevel));
-levelControls.push(createButton("selector", "incButton", nextLevel));
-levelControls.push(createButton("selector", "decButton", prevLevel));
+levelControls.push(createButton("selector", "return-button", returnToMenu));
+levelControls.push(createButton("selector", "reset-button", resetLevel));
+levelControls.push(createButton("selector", "bwd-button", prevLevel));
+levelControls.push(createButton("selector", "fwd-button", nextLevel));
+levelControls.push(createButton("selector", "inc-button", nextLevel));
+levelControls.push(createButton("selector", "dec-button", prevLevel));
 levelControls.push(createLabel("score", "score", "Score: 0"));
 var selectors = createDiv("selectors", "selectors", "");
 
-var progressBar = createDiv("progressBar", "progressBar", "");
-progressBar.appendChild(createDiv("progressStatus", "progressStatus", ""));
+var progressBar = createDiv("progress-bar", "progress-bar", "");
+progressBar.appendChild(createDiv("progress-status", "progress-status", ""));
 
 var levelSelectTable = [];
 for (let i = 0; i < n; ++i) {
@@ -30,9 +30,9 @@ for (let i = 0; i < n; ++i) {
 
 var menuButtons = createDiv("menu", "menu", "");
 menuButtons.setAttribute("align", "center");
-menuButtons.appendChild(createDiv("menu-selector", "newGame", "New game"));
+menuButtons.appendChild(createDiv("menu-selector", "new-game", "New game"));
 menuButtons.lastChild.onclick = startClassicGame;
-menuButtons.appendChild(createDiv("menu-selector", "timeRush", "Endless game"));
+menuButtons.appendChild(createDiv("menu-selector", "endless", "Endless game"));
 menuButtons.lastChild.onclick = startTimeRush;
 
 for (let i = 0; i < levelControls.length; ++i) {

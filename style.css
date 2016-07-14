@@ -42,27 +42,27 @@ canvas {
 }
 
 
-#returnButton {
+#return-button {
     background-image: url('Images/return.png');
 }
 
-#resetButton {
+#reset-button {
     background-image: url('Images/reset.png');
 }
 
-#fwdButton {
+#fwd-button {
     background-image: url('Images/fwd.png');
 }
 
-#bwdButton {
+#bwd-button {
     background-image: url('Images/bwd.png');
 }
 
-#incButton {
+#inc-button {
     background-image: url('Images/plus.png');
 }
 
-#decButton {
+#dec-button {
     background-image: url('Images/minus.png');
 }
 
@@ -102,7 +102,7 @@ canvas {
     font-size: 64px;
 }
 
-.progressBar {
+.progress-bar {
     padding: 0px;
     margin-top: 1%;
     position: relative;
@@ -111,7 +111,7 @@ canvas {
     background-color: #fff;
 }
 
-.progressStatus {
+.progress-status {
     padding: 0px;
     margin: 0px;
     position: absolute;
