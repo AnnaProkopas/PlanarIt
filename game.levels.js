@@ -1,6 +1,6 @@
 var field = [2];
-field.height = 800;
-field.width = 1000;
+field.height = fieldHeight - 70;
+field.width = fieldWidth - 70;
 const presetLevels = [
     {
         points: [{ x: 400, y: 156 },
